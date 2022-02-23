@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import models, fields, api, exceptions
 
 class Course(models.Model):
     _name = 'openacademy.course'
@@ -47,14 +47,21 @@ class Session(models.Model):
         if self.seats < 0:
             return {
                 'warning': {
-                    'title': "Incorrect 'seats' value",
-                    'message': "The number of available seats may not be negative",
+                    'title': "Valor de 'asientos' incorrecto",
+                    'message': "El número de plazas disponibles no puede ser negativo",
                 },
             }
         if self.seats < len(self.attendee_ids):
             return {
                 'warning': {
-                    'title': "Too many attendees",
-                    'message': "Increase seats or remove excess attendees",
+                    'title': "Demasiados asistentes",
+                    'message': "Aumente los asientos o elimine el exceso de asistentes",
                 },
             }
+    
+    @api.constrains('instructor_id', 'attendee_ids')
+    def _check_instructor_not_in_attendees(self):
+        for r in self:
+            if r.instructor_id and r.instructor_id in r.attendee_ids:
+                raise exceptions.ValidationError("El instructor de una sesión no puede ser un asistente")
+
