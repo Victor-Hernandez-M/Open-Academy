@@ -12,6 +12,7 @@ class Course(models.Model):
         ondelete='set null', string="Responsible", index=True)
     session_ids = fields.One2many(
         'openacademy.session', 'course_id', string="Sessions")
+
     
     _sql_constraints = [
         ('name_description_check',
@@ -20,9 +21,8 @@ class Course(models.Model):
 
         ('name_unique',
          'UNIQUE(name)',
-         "El titulo debe ser unico),
+         "El titulo debe ser unico"),
     ]
-
 
 
 class Session(models.Model):
